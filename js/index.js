@@ -57,6 +57,9 @@ var app = {
         }
         function create()
         {
+            windows.addEventListener('resize',resize);
+            resize();
+            
             if(!this.anims.get('run'))
             {
                 this.anims.create(
@@ -72,6 +75,10 @@ var app = {
             }
             
             this.bg = this.add.sprite(0,0,'background').setOrigin(0);
+            
+            this.points = 0;
+            this.hud = this.add.text(10,10,'Pontos: ' + this.points,{fontFamily:'Arial', fontSize:16, color:'#ff2244'});
+
             this.ground = this.add.sprite(0,354,'ground').setOrigin(0);
             this.pikachu = this.add.sprite(70,320,'pikachu');
             this.pikachu.setScale(0.3);
@@ -112,6 +119,7 @@ var app = {
             this.physics.add.collider(this.pokebolas, this.ground);
             this.physics.add.overlap(this.pikachu,this.pokebolas,gameOver,null,this);
             
+            
         }
         function update()
         {
@@ -128,7 +136,7 @@ var app = {
                 this.pikachu.anims.stop();
             }
             
-            if(this.pikachu.x >=700)
+            if(this.pikachu.x >=750)
             {
                 Phaser.Actions.Call(this.pokebolas.getChildren(), function(pokebola)
                 {
@@ -136,11 +144,15 @@ var app = {
                     pokebola.body.velocity.y *= 1.5;
                 },this);
                 this.pikachu.x = 70;
+                this.points ++;
+                this.hud.setText('Pontos: ' + this.points);
             }
         }
         function gameOver()
         {
             this.cameras.main.shake(500);
+            this.points = 0;
+            this.hud.setText('Pontos: ' + this.points);
             
             this.cameras.main.on('camerashakecomplete',function(camera,effect)
             {
@@ -150,6 +162,23 @@ var app = {
             {
                 this.scene.restart();
             },this)
+        }
+        function resize()
+        {
+            var canvas = game.canvas, width = window.innerWidth, hieght = window.innerHeight;
+            var wratio = width / height , ratio = canvas.width/ canvas.height;
+            
+            if(wratio < ratio)
+            {
+                canvas.style.width = width + 'px';
+                canvas.style.height = (width/ratio) + 'px';
+            }
+            else
+            {
+                canvas.style.width = (height*ratio) + 'px';
+                canvas.style.height =  height + 'px';
+            }
+            
         }
     }
 };
