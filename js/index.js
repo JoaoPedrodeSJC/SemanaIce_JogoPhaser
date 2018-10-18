@@ -127,6 +127,16 @@ var app = {
             {
                 this.pikachu.anims.stop();
             }
+            
+            if(this.pikachu.x >=700)
+            {
+                Phaser.Actions.Call(this.pokebolas.getChildren(), function(pokebola)
+                {
+                    this.physics.add.existing(pokebola);
+                    pokebola.body.velocity.y *= 1.5;
+                },this);
+                this.pikachu.x = 70;
+            }
         }
         function gameOver()
         {
