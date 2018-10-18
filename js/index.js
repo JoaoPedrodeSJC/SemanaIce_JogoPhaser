@@ -57,6 +57,20 @@ var app = {
         }
         function create()
         {
+            if(!this.anims.get('run'))
+            {
+                this.anims.create(
+                        {
+                            key: 'run',
+                            frames: this.anims.generateFrameNames('pikachu',
+                            {
+                                frames: [0,1,2,3]
+                            }),
+                            framerate:12,
+                            repeat: -1
+                        });
+            }
+            
             this.bg = this.add.sprite(0,0,'background').setOrigin(0);
             this.ground = this.add.sprite(0,354,'ground').setOrigin(0);
             this.pikachu = this.add.sprite(70,320,'pikachu');
@@ -81,9 +95,10 @@ var app = {
                     });
             
             this.physics.add.existing(this.pikachu);
-            this.pikachu.body.setSize(this.pikachu.width *0.7, this.pikachu.height*0.85);
+            this.pikachu.body.setSize(this.pikachu.width *0.9, this.pikachu.height*0.9);
             
             this.physics.add.existing(this.ground);
+            this.ground.body.immovable = true;
             
             Phaser.Actions.Call( this.pokebolas.getChildren(), function(pokebola)
             {
@@ -94,10 +109,37 @@ var app = {
                 pokebola.body.collideWorldBounds = true;
             },this);
             
+            this.physics.add.collider(this.pokebolas, this.ground);
+            this.physics.add.overlap(this.pikachu,this.pokebolas,gameOver,null,this);
+            
         }
         function update()
         {
+            if(this.input.activePointer.isDown)
+            {
+                this.pikachu.x += 5;
+                if(!this.pikachu.anims.isPlaying)
+                {
+                    this.pikachu.anims.play('run');
+                }
+            }
+            else
+            {
+                this.pikachu.anims.stop();
+            }
+        }
+        function gameOver()
+        {
+            this.cameras.main.shake(500);
             
+            this.cameras.main.on('camerashakecomplete',function(camera,effect)
+            {
+                this.cameras.main.fade(500);
+            },this)
+                        this.cameras.main.on('camerafadeoutcomplete',function(camera,effect)
+            {
+                this.scene.restart();
+            },this)
         }
     }
 };
